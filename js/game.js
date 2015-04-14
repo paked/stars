@@ -5,10 +5,12 @@ function preload() {
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('enemy', 'assets/baddie.png', 32, 48);
 }
 
 var platforms;
 var player;
+var enemies;
 var stars;
 var scoreText;
 var score;
@@ -62,6 +64,17 @@ function create() {
     // create score
     score = 0;
     scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+    
+    // create enemies
+    enemies = game.add.group();
+    enemies.enableBody = true;
+
+    for (i = 0; i < 6; i ++) {
+        var enemy = enemies.create(i * 140, 0, 'enemy');
+        enemy.body.gravity.y = 300;
+        
+        enemy.animations.add('left', [0, 1], 10, true);
+    }
 
     cursors = game.input.keyboard.createCursorKeys();
 }
@@ -69,7 +82,8 @@ function create() {
 function update() {
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
-    
+    game.physics.arcade.collide(enemies, platforms);
+
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
     player.body.velocity.x = 0;
