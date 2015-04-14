@@ -5,7 +5,7 @@ function preload() {
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-    game.load.spritesheet('enemy', 'assets/baddie.png', 32, 48);
+    game.load.spritesheet('enemy', 'assets/baddie.png', 32, 32);
 }
 
 var platforms;
@@ -69,11 +69,15 @@ function create() {
     enemies = game.add.group();
     enemies.enableBody = true;
 
-    for (i = 0; i < 6; i ++) {
-        var enemy = enemies.create(i * 140, 0, 'enemy');
+    for (i = 0; i < 3; i ++) {
+        var enemy = enemies.create(i * 240, 0, 'enemy');
         enemy.body.gravity.y = 300;
+
+        enemy.animations.add('right', [0, 1], 5, true);
+        enemy.animations.add('left', [2, 3], 5, true);
+        enemy.animations.frame = 2;
         
-        enemy.animations.add('left', [0, 1], 10, true);
+        enemy.grounded = false;
     }
 
     cursors = game.input.keyboard.createCursorKeys();
@@ -85,6 +89,7 @@ function update() {
     game.physics.arcade.collide(enemies, platforms);
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, enemies, killPlayer, null, this);
 
     player.body.velocity.x = 0;
     if (cursors.left.isDown) {
@@ -101,6 +106,30 @@ function update() {
     if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.touching.down) {
         player.body.velocity.y = -350;
     }
+
+    enemies.forEachAlive(function(enemy) {
+        if (enemy.body.touching.down) {
+            if (!enemy.grounded) {
+                enemy.body.velocity.x = 100;
+                enemy.grounded = true;
+                enemy.animations.play('left');
+            }
+            return;
+        }
+
+        if (!enemy.grounded) {
+            return;
+        }
+
+        enemy.body.velocity.x *= -1;
+        
+        if (enemy.animations.currentAnim.name == 'left') {
+            enemy.animations.play('right');
+            return;
+        }
+        
+        enemy.animations.play('left');
+    }, this);
 }
 
 function collectStar(player, star) {
@@ -109,4 +138,9 @@ function collectStar(player, star) {
     star.kill();
     console.log(score);
     scoreText.text = 'score: ' + score;
+}
+
+function killPlayer(player, star) {
+    player.kill();
+    game.state.start(game.state.current);
 }
