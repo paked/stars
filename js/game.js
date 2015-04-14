@@ -6,6 +6,8 @@ function preload() {
     game.load.image('star', 'assets/star.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
     game.load.spritesheet('enemy', 'assets/baddie.png', 32, 32);
+    game.load.image('tilesheet', 'assets/generic_platformer_tiles.png');
+    game.load.tilemap('map', 'maps/basic.v1.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
 var platforms;
@@ -14,38 +16,27 @@ var enemies;
 var stars;
 var scoreText;
 var score;
-
+var map;
 var cursors;
 
 function create() {
+    game.stage.backgroundColor = '#47A3FF';
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    
-    // create sky
-    game.add.sprite(0, 0, 'sky');
 
-    platforms = game.add.group();
-    platforms.enableBody = true;
-    
-    // create ground
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
+    // create map
+    map = game.add.tilemap('map');
+    map.addTilesetImage('generic', 'tilesheet');
+    map.setCollisionBetween(0, 45);
 
-    ground.scale.setTo(2, 2);
-
-    ground.body.immovable = true;
-    
-    // create ledges for the character to jump on!
-    var ledge = platforms.create(400, 400, 'ground');
-    ledge.body.immovable = true;
-    
-    ledge = platforms.create(-150, 250, 'ground');
-    ledge.body.immovable = true;
+    platforms = map.createLayer('Tile Layer 1');
+    platforms.resizeWorld();
 
     // create player
     player = game.add.sprite(32, game.world.height - 150, 'dude');
     game.physics.arcade.enable(player);
 
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
+    player.body.bounce.y = 0.1;
+    player.body.gravity.y = 400;
     player.body.collideWorldBounds = true;
 
     player.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -84,8 +75,8 @@ function create() {
 }
 
 function update() {
-    game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(enemies, platforms);
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
@@ -103,12 +94,12 @@ function update() {
         player.frame = 4;
     }
 
-    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.touching.down) {
+    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.onFloor()) {
         player.body.velocity.y = -350;
     }
 
     enemies.forEachAlive(function(enemy) {
-        if (enemy.body.touching.down) {
+        if (enemy.body.onFloor()) {
             if (!enemy.grounded) {
                 enemy.body.velocity.x = 100;
                 enemy.grounded = true;
