@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
+var game = new Phaser.Game(800, 608, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
 
 function preload() {
     game.load.image('sky', 'assets/sky.png');
@@ -7,7 +7,7 @@ function preload() {
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
     game.load.spritesheet('enemy', 'assets/baddie.png', 32, 32);
     game.load.image('tilesheet', 'assets/generic_platformer_tiles.png');
-    game.load.tilemap('map', 'maps/basic.v1.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', 'maps/basic.v3.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
 var platforms;
@@ -28,13 +28,16 @@ function create() {
     map.addTilesetImage('generic', 'tilesheet');
     map.setCollisionBetween(0, 45);
 
-    platforms = map.createLayer('Tile Layer 1');
+    platforms = map.createLayer('Ground');
     platforms.resizeWorld();
+    var stops = map.createLayer('Stoppers');
+    var background = map.createLayer('Background');
 
     // create player
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
+    player = game.add.sprite(0, game.world.height - 150, 'dude');
     game.physics.arcade.enable(player);
 
+    player.x = (game.world.width - player.body.width) / 2;
     player.body.bounce.y = 0.1;
     player.body.gravity.y = 400;
     player.body.collideWorldBounds = true;
@@ -61,7 +64,7 @@ function create() {
     enemies.enableBody = true;
 
     for (i = 0; i < 3; i ++) {
-        var enemy = enemies.create(i * 240, 0, 'enemy');
+        var enemy = enemies.create(i * 240 + 48, 0, 'enemy');
         enemy.body.gravity.y = 300;
 
         enemy.animations.add('right', [0, 1], 5, true);

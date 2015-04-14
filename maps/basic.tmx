@@ -3,9 +3,19 @@
  <tileset firstgid="1" name="generic" tilewidth="32" tileheight="32">
   <image source="../assets/generic_platformer_tiles.png" width="256" height="576"/>
  </tileset>
- <layer name="Tile Layer 1" width="25" height="19">
+ <layer name="Ground" width="25" height="19">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMAoGJ2ACYmYgZqMBZgdiDqg9ukAsRgOsAzUfAMxkAro=
+   eJxjYBgFo2AUjIJRMAoGN2ACYmYgZqMCZgdiDhz26AKxGBWwDpq5AKyMAko=
+  </data>
+ </layer>
+ <layer name="Stoppers" width="25" height="19" opacity="0.11">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMApGAS0BAAdsAAE=
+  </data>
+ </layer>
+ <layer name="Background" width="25" height="19">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMNRAHRDXA3EDifrygbiASPk2IG4H4g4SzM8A4nIgroDyq6B0NRQzoMn3AXE/EE+A8mtJsGsoAQCohAqx
   </data>
  </layer>
 </map>
