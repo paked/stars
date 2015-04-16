@@ -56,14 +56,8 @@ function create() {
     enemies.enableBody = true;
 
     for (i = 0; i < 3; i ++) {
-        var enemy = enemies.create(i * 240 + 48, 0, 'enemy');
-        enemy.body.gravity.y = 300;
-
-        enemy.animations.add('right', [0, 1], 5, true);
-        enemy.animations.add('left', [2, 3], 5, true);
-        enemy.animations.frame = 2;
-        
-        enemy.grounded = false;
+        var enemy = new Enemy(game, i * 240 + 48, 0);
+        enemies.add(enemy);
     }
 
     cursors = game.input.keyboard.createCursorKeys();
@@ -76,30 +70,6 @@ function update() {
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
     game.physics.arcade.overlap(player, enemies, killPlayer, null, this);
-
-    enemies.forEachAlive(function(enemy) {
-        if (enemy.body.onFloor()) {
-            if (!enemy.grounded) {
-                enemy.body.velocity.x = 100;
-                enemy.grounded = true;
-                enemy.animations.play('left');
-            }
-            return;
-        }
-
-        if (!enemy.grounded) {
-            return;
-        }
-
-        enemy.body.velocity.x *= -1;
-        
-        if (enemy.animations.currentAnim.name == 'left') {
-            enemy.animations.play('right');
-            return;
-        }
-        
-        enemy.animations.play('left');
-    }, this);
 }
 
 function collectStar(player, star) {
@@ -146,5 +116,45 @@ Player.prototype.update = function() {
     if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.onFloor()) {
         player.body.velocity.y = -350;
     }
+};
+
+Enemy = function(game, x, y) {
+    Phaser.Sprite.call(this, game, x, y, 'enemy');
+    game.physics.arcade.enable(this);
+    this.body.gravity.y = 300;
+
+    this.animations.add('right', [0, 1], 5, true);
+    this.animations.add('left', [2, 3], 5, true);
+    this.animations.frame = 2;
+    
+    this.grounded = false;
+
+};
+
+Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.update = function() {
+    if (this.body.onFloor()) {
+        if (!this.grounded) {
+            this.body.velocity.x = 100;
+            this.grounded = true;
+            this.animations.play('left');
+        }
+        return;
+    }
+
+    if (!this.grounded) {
+        return;
+    }
+
+    this.body.velocity.x *= -1;
+
+    if (this.animations.currentAnim.name == 'left') {
+        this.animations.play('right');
+        return;
+    }
+
+    this.animations.play('left');
 };
 
