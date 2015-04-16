@@ -8,9 +8,9 @@
    eJxjYBgFo2AUjIJRMAoGN2ACYmYgZqMCZgdiDhz26AKxGBWwDpq5AKyMAko=
   </data>
  </layer>
- <layer name="Stoppers" width="25" height="19" opacity="0.11">
+ <layer name="Stoppers" width="25" height="19">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMApGAS0BAAdsAAE=
+   eJxjYBgFo2AUjIJRMArIA61DzNyBAgANUwEL
   </data>
  </layer>
  <layer name="Background" width="25" height="19">

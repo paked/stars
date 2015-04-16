@@ -11,6 +11,7 @@ function preload() {
 }
 
 var platforms;
+var stoppers;
 var player;
 var enemies;
 var stars;
@@ -30,7 +31,8 @@ function create() {
 
     platforms = map.createLayer('Ground');
     platforms.resizeWorld();
-    var stops = map.createLayer('Stoppers');
+    stoppers = map.createLayer('Stoppers');
+    stoppers.visible = false;
     var background = map.createLayer('Background');
 
     // create player
@@ -54,9 +56,10 @@ function create() {
     // create enemies
     enemies = game.add.group();
     enemies.enableBody = true;
-
-    for (i = 0; i < 3; i ++) {
-        var enemy = new Enemy(game, i * 240 + 48, 0);
+    
+    var positions = [100, 350, 600];
+    for (var p in positions) {
+        var enemy = new Enemy(game, positions[p], 0);
         enemies.add(enemy);
     }
 
@@ -128,33 +131,51 @@ Enemy = function(game, x, y) {
     this.animations.frame = 2;
     
     this.grounded = false;
-
 };
 
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.update = function() {
-    if (this.body.onFloor()) {
-        if (!this.grounded) {
-            this.body.velocity.x = 100;
-            this.grounded = true;
-            this.animations.play('left');
+    if (this.body.onFloor() && !this.grounded) {
+        console.log("reset");
+        this.body.velocity.x = 100;
+        this.grounded = true;
+        this.animations.play('left');
+        this.lastTime = this.game.time.now - 100;
+    }
+
+    var tileX = stoppers.getTileX(this.x + this.body.width/2);
+    var tileY = stoppers.getTileY(this.y + this.body.height/2);
+    if (this.isEdge(stoppers.index, tileX, tileY)) {
+        if (this.game.time.now - this.lastTime < 100) {
+            return;
         }
-        return;
+
+        this.body.velocity.x *= -1;
+        this.lastTime = this.game.time.now;
+
+        if (this.animations.currentAnim.name == 'left') {
+            this.animations.play('right');
+            return;
+        }
+        
+        this.animations.play('left');
+    }
+};
+
+Enemy.prototype.isEdge = function(index, x, y) {
+    var leftTile = map.getTileLeft(index, x, y);
+    var rightTile = map.getTileRight(index, x, y);
+    
+    if (!leftTile && rightTile) {
+        return rightTile.index != -1;
     }
 
-    if (!this.grounded) {
-        return;
+    if (!rightTile && leftTile) {
+        return leftTale.index != -1;
     }
 
-    this.body.velocity.x *= -1;
-
-    if (this.animations.currentAnim.name == 'left') {
-        this.animations.play('right');
-        return;
-    }
-
-    this.animations.play('left');
+    return (leftTile.index != -1) || (rightTile.index != -1);
 };
 
