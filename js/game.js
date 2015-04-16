@@ -34,16 +34,8 @@ function create() {
     var background = map.createLayer('Background');
 
     // create player
-    player = game.add.sprite(0, game.world.height - 150, 'dude');
-    game.physics.arcade.enable(player);
-
-    player.x = (game.world.width - player.body.width) / 2;
-    player.body.bounce.y = 0.1;
-    player.body.gravity.y = 400;
-    player.body.collideWorldBounds = true;
-
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    player = new Player(game, 0, game.world.height - 150);
+    game.add.existing(player);
 
     // create stars
     stars = game.add.group();
@@ -85,22 +77,6 @@ function update() {
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
     game.physics.arcade.overlap(player, enemies, killPlayer, null, this);
 
-    player.body.velocity.x = 0;
-    if (cursors.left.isDown) {
-        player.body.velocity.x = -300;
-        player.animations.play('left');
-    }else if (cursors.right.isDown) {
-        player.body.velocity.x = 300;
-        player.animations.play('right');
-    }else {
-        player.animations.stop();
-        player.frame = 4;
-    }
-
-    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.onFloor()) {
-        player.body.velocity.y = -350;
-    }
-
     enemies.forEachAlive(function(enemy) {
         if (enemy.body.onFloor()) {
             if (!enemy.grounded) {
@@ -130,7 +106,6 @@ function collectStar(player, star) {
     score += 10;
 
     star.kill();
-    console.log(score);
     scoreText.text = 'score: ' + score;
 }
 
@@ -138,3 +113,38 @@ function killPlayer(player, star) {
     player.kill();
     game.state.start(game.state.current);
 }
+
+Player = function(game, x, y) {
+    Phaser.Sprite.call(this, game, x, y, 'dude');
+    game.physics.arcade.enable(this);
+
+    this.x = (game.world.width - this.body.width) / 2;
+    this.body.bounce.y = 0.1;
+    this.body.gravity.y = 400;
+    this.body.collideWorldBounds = true;
+
+    this.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.animations.add('right', [5, 6, 7, 8], 10, true);
+};
+
+Player.prototype = Object.create(Phaser.Sprite.prototype);
+Player.prototype.constructor = Player;
+
+Player.prototype.update = function() { 
+    this.body.velocity.x = 0;
+    if (cursors.left.isDown) {
+        this.body.velocity.x = -300;
+        this.animations.play('left');
+    }else if (cursors.right.isDown) {
+        this.body.velocity.x = 300;
+        this.animations.play('right');
+    }else {
+        this.animations.stop();
+        this.frame = 4;
+    }  
+
+    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.onFloor()) {
+        player.body.velocity.y = -350;
+    }
+};
+
