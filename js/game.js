@@ -104,11 +104,13 @@ Player = function(game, x, y) {
 
     this.x = (game.world.width - this.body.width) / 2;
     this.body.bounce.y = 0.1;
-    this.body.gravity.y = 400;
+    this.body.gravity.y = 1200;
+    this.body.mass = 100;
     this.body.collideWorldBounds = true;
 
     this.animations.add('left', [0, 1, 2, 3], 10, true);
     this.animations.add('right', [5, 6, 7, 8], 10, true);
+
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -117,18 +119,18 @@ Player.prototype.constructor = Player;
 Player.prototype.update = function() { 
     this.body.velocity.x = 0;
     if (cursors.left.isDown) {
-        this.body.velocity.x = -300;
+        this.body.velocity.x = -350;
         this.animations.play('left');
     }else if (cursors.right.isDown) {
-        this.body.velocity.x = 300;
+        this.body.velocity.x = 350;
         this.animations.play('right');
     }else {
         this.animations.stop();
         this.frame = 4;
-    }  
+    }
 
-    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && player.body.onFloor()) {
-        player.body.velocity.y = -350;
+    if ((cursors.up.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) && this.body.onFloor()) {
+        this.body.velocity.y = -600;
     }
 };
 
