@@ -43,10 +43,21 @@ function create() {
     stars = game.add.group();
     stars.enableBody = true;
 
+
+    var counter = 0;
+    var increase = Math.PI * 2 / 12;
+    bounces = [];
+    for ( i = 0; i <= 1; i += 0.0833333) {
+        x = i;
+        y = Math.sin( counter ) / 2 + 0.5;
+        counter += increase;
+        bounces.push(y);
+    }
+    
     for (var i = 0; i < 12; i ++) {
         var star = stars.create(i * 70, 0, 'star');
         star.body.gravity.y = 300;
-        star.body.bounce.y = 0.7 + Math.random() * 0.2; 
+        star.body.bounce.y = 0.4 + (bounces[i] * 0.2);
     }
 
     // create score
